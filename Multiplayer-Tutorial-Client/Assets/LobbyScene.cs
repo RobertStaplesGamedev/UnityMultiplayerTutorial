@@ -9,6 +9,8 @@ public class LobbyScene : MonoBehaviour
 
     public TMP_Text welcomeMessage;
 
+    public TMP_InputField ipAddress;
+
     public TMP_InputField createEmail;
     public TMP_InputField createUsername;
     public TMP_InputField createPassword;
@@ -41,6 +43,12 @@ public class LobbyScene : MonoBehaviour
 
         Client.Instance.SendLoginRequest(email, password);
     }
+    public void OnClickSetIPAddress() {
+        Client.Instance.SERVER_IP = ipAddress.text;
+        Debug.Log(ipAddress.text);
+        Debug.Log(Client.Instance.SERVER_IP);
+        Client.Instance.Init();
+    }
 
     public void SetWelcomeMessage(string msg) {
         welcomeMessage.text = msg;
@@ -53,5 +61,6 @@ public class LobbyScene : MonoBehaviour
     public void EnableInputs(bool enable) {
         GameObject.Find("Canvas").GetComponent<CanvasGroup>().interactable = enable;
     }
+
 
 }

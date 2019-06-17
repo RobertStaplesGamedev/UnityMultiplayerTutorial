@@ -12,9 +12,9 @@ public class Client : MonoBehaviour
     private const int MAX_USER = 100;
     private const int PORT = 26000;
     private const int WEB_PORT = 26001;
-    private const string SERVER_IP = "127.0.0.1";
     private const int BYTE_SIZE= 1024;
 
+    public string SERVER_IP = "127.0.0.1";
     private byte error;
 
     private byte reliableChannel;
@@ -28,7 +28,6 @@ public class Client : MonoBehaviour
     {
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        Init();
     }
     
     void Update() {
