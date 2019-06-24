@@ -19,9 +19,10 @@ public class Networking : MonoBehaviourPunCallbacks, IInRoomCallbacks
     public TMP_Text playerName;
 
     public GameObject playerPanel;
-    public TMP_Text Player1;
-    public TMP_Text Player2;
-    int PlayerCount = 0;
+    public GameObject Player1Text;
+    public GameObject Player2Text;
+    public Player Player1;
+    public Player Player2;
 
 void Start()
     {
@@ -36,8 +37,6 @@ void Start()
     void Update()
     {
         BtnConnectRoom.gameObject.SetActive(PhotonNetwork.IsConnected && !TriesToConnectToMaster && !TriesToConnectToRoom);
-
-
     }
     void Awake()
     {
@@ -48,9 +47,21 @@ void Start()
 
     public override void OnPlayerEnteredRoom(Player otherPlayer) {
         base.OnPlayerEnteredRoom(otherPlayer);
-        if (!otherPlayer.IsInactive) {
-            Player2.text = otherPlayer.NickName;
+        Player2Text.SetActive(true);
+        Player2Text.GetComponent<TMP_Text>().text = otherPlayer.NickName;
+        Player2 = otherPlayer;
+        Debug.Log("test");
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer) {
+        base.OnPlayerLeftRoom(otherPlayer);
+        if (otherPlayer == Player1) {
+            Player1Text.GetComponent<TMP_Text>().text = Player2.NickName;
+            Player1 = Player2;
         }
+
+        Player2Text.SetActive(false);
+        Player2 = null;
     }
 
     public void ConnectToMaster()
@@ -118,6 +129,7 @@ void Start()
         base.OnJoinedRoom();
         TriesToConnectToRoom = false;
         Debug.Log("Master: " + PhotonNetwork.IsMasterClient + " | Players In Room: " + PhotonNetwork.CurrentRoom.PlayerCount + " | RoomName: " + PhotonNetwork.CurrentRoom.Name);
+        playerPanel.SetActive(true);
         PlaceName();
     }
 
@@ -125,12 +137,16 @@ void Start()
         //if (player = player1) {
         Player[] others = PhotonNetwork.PlayerListOthers;
         if (others.Length == 0) {
-            Player1.text = PhotonNetwork.NickName;
+            Player1Text.GetComponent<TMP_Text>().text = PhotonNetwork.NickName;
+            Player1 = PhotonNetwork.LocalPlayer;
         } else {
             Debug.Log(others[0].NickName);
-            Player1.text = others[0].NickName;
-            Player2.text = playerName.text;
+            Player1 = others[0];
+            Player1Text.GetComponent<TMP_Text>().text = others[0].NickName;
+            Player2 = PhotonNetwork.LocalPlayer;
+            Player2Text.GetComponent<TMP_Text>().text = playerName.text;
+            Player2Text.SetActive(true);
         }
-        PlayerCount++;
+        Player1Text.SetActive(true);
     }
 }
