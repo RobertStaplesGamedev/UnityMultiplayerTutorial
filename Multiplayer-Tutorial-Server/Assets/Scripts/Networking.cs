@@ -21,6 +21,13 @@ public class Networking : MonoBehaviourPunCallbacks, IInRoomCallbacks
     public GameObject playerPanel;
     public GameObject Player1Text;
     public GameObject Player2Text;
+
+    public GameObject connecting;
+    public GameObject roomPanel;
+    public TMP_Text roomText;
+    public Button roomButton;
+    public Button Disconnect;
+
     public Player Player1;
     public Player Player2;
 
@@ -37,6 +44,12 @@ void Start()
     void Update()
     {
         BtnConnectRoom.gameObject.SetActive(PhotonNetwork.IsConnected && !TriesToConnectToMaster && !TriesToConnectToRoom);
+
+        if (roomText.text.Length > 1 && playerName.text.Length > 1) {
+            roomButton.interactable = true;
+        } else {
+            roomButton.interactable = false;
+        }
     }
     void Awake()
     {
@@ -80,6 +93,8 @@ void Start()
         base.OnConnectedToMaster();
         TriesToConnectToMaster = false;
         Debug.Log("Connected to Master!");
+        connecting.SetActive(false);
+        roomPanel.SetActive(true);
     }
 
     public override void OnDisconnected(DisconnectCause cause)
@@ -131,6 +146,7 @@ void Start()
         Debug.Log("Master: " + PhotonNetwork.IsMasterClient + " | Players In Room: " + PhotonNetwork.CurrentRoom.PlayerCount + " | RoomName: " + PhotonNetwork.CurrentRoom.Name);
         playerPanel.SetActive(true);
         PlaceName();
+        Disconnect.gameObject.SetActive(true);
     }
 
     public void PlaceName() {
@@ -148,5 +164,10 @@ void Start()
             Player2Text.SetActive(true);
         }
         Player1Text.SetActive(true);
+    }
+
+    public void OnClickDisconnect() {
+        PhotonNetwork.LeaveRoom();
+        Disconnect.gameObject.SetActive(false);
     }
 }
