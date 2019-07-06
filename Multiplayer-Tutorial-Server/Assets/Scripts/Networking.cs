@@ -29,9 +29,15 @@ public class Networking : MonoBehaviourPunCallbacks, IInRoomCallbacks
     public Button Disconnect;
 
     public Player Player1;
+    [HideInInspector] public Playerinfo player1info;
     public Player Player2;
+    [HideInInspector] public Playerinfo player2info;
 
-void Start()
+    public GameObject PlayerPrefab;
+
+    public ColourPicker colourPicker;
+
+    void Start()
     {
         TriesToConnectToMaster = false;
         TriesToConnectToRoom   = false;
@@ -145,29 +151,56 @@ void Start()
         TriesToConnectToRoom = false;
         Debug.Log("Master: " + PhotonNetwork.IsMasterClient + " | Players In Room: " + PhotonNetwork.CurrentRoom.PlayerCount + " | RoomName: " + PhotonNetwork.CurrentRoom.Name);
         playerPanel.SetActive(true);
-        PlaceName();
+        CreatePlayer();
         Disconnect.gameObject.SetActive(true);
     }
 
-    public void PlaceName() {
+    public void CreatePlayer() {
         //if (player = player1) {
         Player[] others = PhotonNetwork.PlayerListOthers;
         if (others.Length == 0) {
             Player1Text.GetComponent<TMP_Text>().text = PhotonNetwork.NickName;
             Player1 = PhotonNetwork.LocalPlayer;
+            GameObject Player1Object = Instantiate(PlayerPrefab, new Vector3(0,0,0), Quaternion.identity);
+            player1info = Player1Object.GetComponent<Playerinfo>();
+            player1info.playerNumber = 1;
+            player1info.playerColour = colourPicker.pickedColour;
+            player1info.isLocal = true;
+            ChangePlayerColour(player1info.playerColour);
         } else {
-            Debug.Log(others[0].NickName);
             Player1 = others[0];
             Player1Text.GetComponent<TMP_Text>().text = others[0].NickName;
             Player2 = PhotonNetwork.LocalPlayer;
             Player2Text.GetComponent<TMP_Text>().text = playerName.text;
             Player2Text.SetActive(true);
+            GameObject Player1Object = Instantiate(PlayerPrefab, new Vector3(0,0,0), Quaternion.identity);
+            player1info = Player1Object.GetComponent<Playerinfo>();
+            player1info.playerNumber = 1;
+            player1info.playerColour = colourPicker.pickedColour;
+            player1info.isLocal = false;
+            GameObject Player2Object = Instantiate(PlayerPrefab, new Vector3(0,0,0), Quaternion.identity);
+            player2info = Player2Object.GetComponent<Playerinfo>();
+            player2info.playerNumber = 2;
+            player2info.playerColour = colourPicker.pickedColour;
+            player2info.isLocal = true;
+            ChangePlayerColour(player2info.playerColour);
         }
         Player1Text.SetActive(true);
+        
     }
 
     public void OnClickDisconnect() {
         PhotonNetwork.LeaveRoom();
         Disconnect.gameObject.SetActive(false);
+    }
+
+    public void ChangePlayerColour(Color colour) {
+        if (player1info.isLocal) {
+            player1info.playerColour = colour;
+            playerPanel.GetComponent<PlayerColour>().ChangeColour(player1info.playerNumber, player1info.playerColour);
+        } else {
+            player2info.playerColour = colour;
+            playerPanel.GetComponent<PlayerColour>().ChangeColour(player2info.playerNumber, player2info.playerColour);
+        }
     }
 }
