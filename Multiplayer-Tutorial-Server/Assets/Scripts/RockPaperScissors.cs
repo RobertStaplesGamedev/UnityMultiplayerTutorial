@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using TMPro;
 
-public class RockPaperScissors : MonoBehaviour , IPunObservable
+public class RockPaperScissors : MonoBehaviour, IPunObservable
 {
     PhotonView PV;
 
@@ -13,7 +14,13 @@ public class RockPaperScissors : MonoBehaviour , IPunObservable
     public bool player2IsLocked = false;
     public int player2Selection;
 
+    public TMP_Text winnerText;
+
     public Playerinfo Player;
+
+    public Button scissors;
+    public Button paper;
+    public Button rock;
 
     //0 is scissors
     //1 is Paper
@@ -29,17 +36,28 @@ public class RockPaperScissors : MonoBehaviour , IPunObservable
         } else if (Player.playerNumber == 2) {
             player2Selection = selection;
         }
+        if (selection == 0) {
+            scissors.interactable = false;
+            paper.interactable = true;
+            rock.interactable = true;
+        } else if (selection == 1) {
+            scissors.interactable = true;
+            paper.interactable = false;
+            rock.interactable = true;
+        } else if (selection == 2) {
+            scissors.interactable = true;
+            paper.interactable = true;
+            rock.interactable = false;
+        }
     }
 
     public void OnClickLockSelection () {
-        if (PV.IsMine) {
             if (Player.playerNumber == 1) {
-                PV.RPC("RPC_LockSelection", RpcTarget.AllBuffered, 1, player1Selection, true);
+                PV.RPC("RPC_LockSelection", RpcTarget.AllBuffered, Player.playerNumber, player1Selection, true);
             }
             else if (Player.playerNumber == 2) {
-                PV.RPC("RPC_LockSelection", RpcTarget.AllBuffered, 2, player2Selection, true);
+                PV.RPC("RPC_LockSelection", RpcTarget.AllBuffered, Player.playerNumber, player2Selection, true);
             }
-        }
     }
 
     [PunRPC] void RPC_LockSelection(int player, int selection, bool isLocked) {
@@ -49,6 +67,9 @@ public class RockPaperScissors : MonoBehaviour , IPunObservable
         } else if (player == 2) {
             player2Selection = selection;
             player2IsLocked = isLocked;
+        }
+        if (player1IsLocked && player2IsLocked) {
+            SelectWinner();
         }
     }
 
@@ -77,7 +98,18 @@ public class RockPaperScissors : MonoBehaviour , IPunObservable
 
     [PunRPC] public void RPC_DeclareWinner(int winningPlayer) {
         //Declare winner
-        Debug.Log(string.Format("Player {0} Won", winningPlayer));
+        winnerText.gameObject.SetActive(true);
+        Debug.Log(winningPlayer);
+        if (winningPlayer != 0) {
+            winnerText.text = string.Format("Player {0} Won", winningPlayer);
+        } else {
+            winnerText.text = "Draw";
+        }
+        float waitTime = 3;
+        while (waitTime > 0) {
+            waitTime -= Time.deltaTime;
+        }
+        //winnerText.gameObject.SetActive(false);
         player1IsLocked = false;
         player2IsLocked = false;
     }

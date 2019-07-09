@@ -130,8 +130,7 @@ public class Networking : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
     public override void OnJoinedLobby() {
         base.OnJoinedLobby();
-        PhotonNetwork.JoinRandomRoom();
-        //PhotonNetwork.JoinOrCreateRoom(RoomName.text, new RoomOptions { MaxPlayers = 2 }, null); //Create a specific Room - Error: OnCreateRoomFailed
+        PhotonNetwork.JoinOrCreateRoom(RoomName.text, new RoomOptions { MaxPlayers = 2 }, null); //Create a specific Room - Error: OnCreateRoomFailed
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
