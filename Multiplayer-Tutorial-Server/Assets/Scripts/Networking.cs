@@ -36,6 +36,9 @@ public class Networking : MonoBehaviourPunCallbacks, IInRoomCallbacks
     public GameObject PlayerPrefab;
 
     public ColourPicker colourPicker;
+    public RockPaperScissors rps;
+    public GameObject pregameObject;
+    public GameObject rpsObject;
 
     void Start()
     {
@@ -69,7 +72,7 @@ public class Networking : MonoBehaviourPunCallbacks, IInRoomCallbacks
         Player2Text.SetActive(true);
         Player2Text.GetComponent<TMP_Text>().text = otherPlayer.NickName;
         Player2 = otherPlayer;
-        Debug.Log("test");
+        Debug.Log(string.Format("{0}", otherPlayer.NickName));
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer) {
@@ -101,6 +104,7 @@ public class Networking : MonoBehaviourPunCallbacks, IInRoomCallbacks
         Debug.Log("Connected to Master!");
         connecting.SetActive(false);
         roomPanel.SetActive(true);
+        Debug.Log(PhotonNetwork.CountOfPlayersInRooms);
     }
 
     public override void OnDisconnected(DisconnectCause cause)
@@ -126,7 +130,8 @@ public class Networking : MonoBehaviourPunCallbacks, IInRoomCallbacks
 
     public override void OnJoinedLobby() {
         base.OnJoinedLobby();
-        PhotonNetwork.JoinOrCreateRoom(RoomName.text, new RoomOptions { MaxPlayers = 2 }, null); //Create a specific Room - Error: OnCreateRoomFailed
+        PhotonNetwork.JoinRandomRoom();
+        //PhotonNetwork.JoinOrCreateRoom(RoomName.text, new RoomOptions { MaxPlayers = 2 }, null); //Create a specific Room - Error: OnCreateRoomFailed
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -153,6 +158,13 @@ public class Networking : MonoBehaviourPunCallbacks, IInRoomCallbacks
         playerPanel.SetActive(true);
         CreatePlayer();
         Disconnect.gameObject.SetActive(true);
+        if (player1info != null && player1info.isLocal) {
+            rps.Player = player1info;
+        } else if (player2info != null && player2info.isLocal) {
+            rps.Player = player2info;
+        }
+        pregameObject.SetActive(false);
+        rpsObject.SetActive(true);
     }
 
     public void CreatePlayer() {
@@ -186,12 +198,13 @@ public class Networking : MonoBehaviourPunCallbacks, IInRoomCallbacks
             ChangePlayerColour(player2info.playerColour);
         }
         Player1Text.SetActive(true);
-        
     }
 
     public void OnClickDisconnect() {
         PhotonNetwork.LeaveRoom();
         Disconnect.gameObject.SetActive(false);
+        pregameObject.SetActive(true);
+        rpsObject.SetActive(false);
     }
 
     public void ChangePlayerColour(Color colour) {
