@@ -52,12 +52,12 @@ public class RockPaperScissors : MonoBehaviour, IPunObservable
     }
 
     public void OnClickLockSelection () {
-            if (Player.playerNumber == 1) {
-                PV.RPC("RPC_LockSelection", RpcTarget.AllBuffered, Player.playerNumber, player1Selection, true);
-            }
-            else if (Player.playerNumber == 2) {
-                PV.RPC("RPC_LockSelection", RpcTarget.AllBuffered, Player.playerNumber, player2Selection, true);
-            }
+        if (Player.playerNumber == 1) {
+            PV.RPC("RPC_LockSelection", RpcTarget.AllBuffered, Player.playerNumber, player1Selection, true);
+        }
+        else if (Player.playerNumber == 2) {
+            PV.RPC("RPC_LockSelection", RpcTarget.AllBuffered, Player.playerNumber, player2Selection, true);
+        }
     }
 
     [PunRPC] void RPC_LockSelection(int player, int selection, bool isLocked) {
@@ -99,7 +99,6 @@ public class RockPaperScissors : MonoBehaviour, IPunObservable
     [PunRPC] public void RPC_DeclareWinner(int winningPlayer) {
         //Declare winner
         winnerText.gameObject.SetActive(true);
-        Debug.Log(winningPlayer);
         if (winningPlayer != 0) {
             winnerText.text = string.Format("Player {0} Won", winningPlayer);
         } else {
@@ -108,6 +107,7 @@ public class RockPaperScissors : MonoBehaviour, IPunObservable
         float waitTime = 3;
         while (waitTime > 0) {
             waitTime -= Time.deltaTime;
+            Debug.Log(waitTime);
         }
         //winnerText.gameObject.SetActive(false);
         player1IsLocked = false;
